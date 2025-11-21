@@ -1,25 +1,82 @@
-import  java_cup.runtime.*;
+package ini.parser;
 
-/* TERMINAIS */
-terminal Z, BOOLEAN, IDENTIFIER, NUMBER, BREAK, STRING, ASSIGN;
+import java_cup.runtime.*;
+import java.util.HashMap;
+import java.util.Map;
 
-/* NÃO TERMINAIS */
-non terminal lista_secao, secao, titulo_secao, lista_propriedades, titulo_prop, valor_prop, propriedade;
+parser code {:
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Error");
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+            if (s.left >= 0) {
+                m.append(" in line "+(s.left+1));
+                if (s.right >= 0)
+                    m.append(", column "+(s.right+1));
+            }
+        }
+        m.append(" : "+message);
+        System.err.println(m);
+    }
 
-start with lista_secao;
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        throw new RuntimeException("Fatal Error");
+    }
+:};
 
-/* GRAMÁTICA */
-lista_secao ::= lista_secao secao | secao;
+terminal LBRACK, RBRACK, EQUALS;
+terminal String ID, STRING, BOOLEAN;
+terminal Integer NUMBER;
 
-/* AQUI ESTÁ A CORREÇÃO: Adicionando o BREAK depois do título */
-secao ::= titulo_secao BREAK lista_propriedades;
+non terminal HashMap<String, Object> config;
+non terminal HashMap<String, Object> section;
+non terminal String section_name;
+non terminal HashMap<String, Object> properties;
+non terminal Object property;
+non terminal Object value;
 
-lista_propriedades ::= lista_propriedades propriedade | propriedade;
+precedence left LBRACK, RBRACK;
 
-propriedade ::= titulo_prop ASSIGN valor_prop BREAK;
+start with config;
 
-titulo_prop ::= IDENTIFIER;
+config ::= section:s
+           {:
+             RESULT = s;
+           :}
+         | config:c section:s
+           {:
+             c.putAll(s);
+             RESULT = c;
+           :};
 
-valor_prop ::= STRING | BOOLEAN | NUMBER;
+section ::= LBRACK ID:name RBRACK properties:p
+            {:
+              RESULT = new HashMap<String, Object>();
+              RESULT.put(name, p);
+            :};
 
-titulo_secao ::= Z IDENTIFIER;
+properties ::= property:p
+               {:
+                 RESULT = (HashMap<String, Object>)p;
+               :}
+             | properties:props property:p
+               {:
+                 props.putAll((HashMap<String, Object>)p);
+                 RESULT = props;
+               :};
+
+property ::= ID:key EQUALS value:val
+             {:
+               RESULT = new HashMap<String, Object>();
+               ((HashMap<String, Object>)RESULT).put(key, val);
+             :};
+
+value ::= STRING:s
+          {: RESULT = s; :}
+        | NUMBER:n
+          {: RESULT = n; :}
+        | BOOLEAN:b
+          {: RESULT = Boolean.parseBoolean(b); :}
+        | ID:id
+          {: RESULT = id; :};

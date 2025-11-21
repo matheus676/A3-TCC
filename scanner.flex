@@ -1,3 +1,5 @@
+package ini.parser;
+
 import java_cup.runtime.Symbol;
 
 %%
@@ -6,35 +8,44 @@ import java_cup.runtime.Symbol;
 %cup
 %line
 %column
-%public
 
-ID           = [a-yA-Z][a-zA-Z]*
-NUM          = [0-9]+
-WHITESPACE   = [ \t\r]+
+%{
+  private Symbol symbol(int type) {
+    return new Symbol(type, yyline, yycolumn);
+  }
 
-STRING       = [".+"]
+  private Symbol symbol(int type, Object value) {
+    return new Symbol(type, yyline, yycolumn, value);
+  }
+%}
+
+LineTerminator = \r|\n|\r\n
+WhiteSpace     = {LineTerminator} | [ \t\f]
+
+/* Keywords */
+BOOLEAN = true|false
+
+/* Numbers */
+NUMBER = [0-9]+
+
+/* Strings */
+STRING = \"[^\"]*\"
+
+/* Identifiers */
+ID = [a-zA-Z_][a-zA-Z0-9_]*
 
 %%
 
+<YYINITIAL> {
+  "["            { return symbol(sym.LBRACK); }
+  "]"            { return symbol(sym.RBRACK); }
+  "="            { return symbol(sym.EQUALS); }
+  {BOOLEAN}      { return symbol(sym.BOOLEAN, yytext()); }
+  {NUMBER}       { return symbol(sym.NUMBER, Integer.parseInt(yytext())); }
+  {STRING}       { return symbol(sym.STRING, yytext().substring(1, yytext().length() - 1)); }
+  {ID}           { return symbol(sym.ID, yytext()); }
+  {WhiteSpace}   { /* ignore */ }
+}
 
-"z"           { return new Symbol(sym.Z); }   
-"="          { return new Symbol(sym.ASSIGN); }
+[^] { System.err.println("Illegal character: " + yytext()); }
 
-"true"       { return new Symbol(sym.BOOLEAN, Boolean.parseBoolean(yytext())); }
-"false"      { return new Symbol(sym.BOOLEAN, Boolean.parseBoolean(yytext())); }
-
-{ID}         { return new Symbol(sym.IDENTIFIER); }
-{NUM}        { 
-    int aux = Integer.parseInt(yytext());
-    return new Symbol(sym.NUMBER, aux); 
-    }
-{STRING}     { return new Symbol(sym.STRING); }
-
-/* Newline is the BREAK terminal */
-"\n"         { return new Symbol(sym.BREAK); }
-
-/* Ignore whitespace */
-{WHITESPACE} { System.err.println("Illegal character: <" + yytext() + ">"); }
-
-/* Report other characters as errors */
-.            { System.err.println("Illegal character: <" + yytext() + ">"); }
