@@ -1,0 +1,82 @@
+package ini.parser;
+
+import java_cup.runtime.*;
+import java.util.HashMap;
+import java.util.Map;
+
+parser code {:
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Error");
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+            if (s.left >= 0) {
+                m.append(" in line "+(s.left+1));
+                if (s.right >= 0)
+                    m.append(", column "+(s.right+1));
+            }
+        }
+        m.append(" : "+message);
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        throw new RuntimeException("Fatal Error");
+    }
+:};
+
+terminal LBRACK, RBRACK, EQUALS;
+terminal String ID, STRING, BOOLEAN;
+terminal Integer NUMBER;
+
+non terminal HashMap<String, Object> config;
+non terminal HashMap<String, Object> section;
+non terminal String section_name;
+non terminal HashMap<String, Object> properties;
+non terminal Object property;
+non terminal Object value;
+
+precedence left LBRACK, RBRACK;
+
+start with config;
+
+config ::= section:s
+           {:
+             RESULT = s;
+           :}
+         | config:c section:s
+           {:
+             c.putAll(s);
+             RESULT = c;
+           :};
+
+section ::= LBRACK ID:name RBRACK properties:p
+            {:
+              RESULT = new HashMap<String, Object>();
+              RESULT.put(name, p);
+            :};
+
+properties ::= property:p
+               {:
+                 RESULT = (HashMap<String, Object>)p;
+               :}
+             | properties:props property:p
+               {:
+                 props.putAll((HashMap<String, Object>)p);
+                 RESULT = props;
+               :};
+
+property ::= ID:key EQUALS value:val
+             {:
+               RESULT = new HashMap<String, Object>();
+               ((HashMap<String, Object>)RESULT).put(key, val);
+             :};
+
+value ::= STRING:s
+          {: RESULT = s; :}
+        | NUMBER:n
+          {: RESULT = n; :}
+        | BOOLEAN:b
+          {: RESULT = Boolean.parseBoolean(b); :}
+        | ID:id
+          {: RESULT = id; :};
