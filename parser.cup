@@ -1,0 +1,25 @@
+import  java_cup.runtime.*;
+
+/* TERMINAIS */
+terminal Z, BOOLEAN, IDENTIFIER, NUMBER, BREAK, STRING, ASSIGN;
+
+/* NÃO TERMINAIS */
+non terminal lista_secao, secao, titulo_secao, lista_propriedades, titulo_prop, valor_prop, propriedade;
+
+start with lista_secao;
+
+/* GRAMÁTICA */
+lista_secao ::= lista_secao secao | secao;
+
+/* AQUI ESTÁ A CORREÇÃO: Adicionando o BREAK depois do título */
+secao ::= titulo_secao BREAK lista_propriedades;
+
+lista_propriedades ::= lista_propriedades propriedade | propriedade;
+
+propriedade ::= titulo_prop ASSIGN valor_prop BREAK;
+
+titulo_prop ::= IDENTIFIER;
+
+valor_prop ::= STRING | BOOLEAN | NUMBER;
+
+titulo_secao ::= Z IDENTIFIER;
