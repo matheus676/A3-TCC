@@ -6,35 +6,28 @@ import java_cup.runtime.Symbol;
 %cup
 %line
 %column
-%public
 
-ID           = [a-yA-Z][a-zA-Z]*
-NUM          = [0-9]+
-WHITESPACE   = [ \t\r]+
-
-STRING       = [".+"]
+Digito = [0-9]+
+Id = [a-zA-Z]+
+Espaco = [ \t\r\n]+
 
 %%
 
+"se"        { return new Symbol(sym.SE); }
+"entao"     { return new Symbol(sym.ENTAO); }
+"senao"     { return new Symbol(sym.SENAO); }
+/*"enquanto"  { return new Symbol(sym.ENQUANTO); }
+"faca"      { return new Symbol(sym.FACA); }
+"inicio"    { return new Symbol(sym.INICIO); }
+"fim"       { return new Symbol(sym.FIM); }*/
+"+"         { return new Symbol(sym.MAIS); }
+">"         { return new Symbol(sym.MAIOR); }
+"="         { return new Symbol(sym.IGUAL); }
+"("         { return new Symbol(sym.AP); }
+")"         { return new Symbol(sym.FP); }
+";"         { return new Symbol(sym.PV); }
 
-"z"           { return new Symbol(sym.Z); }   
-"="          { return new Symbol(sym.ASSIGN); }
-
-"true"       { return new Symbol(sym.BOOLEAN, Boolean.parseBoolean(yytext())); }
-"false"      { return new Symbol(sym.BOOLEAN, Boolean.parseBoolean(yytext())); }
-
-{ID}         { return new Symbol(sym.IDENTIFIER); }
-{NUM}        { 
-    int aux = Integer.parseInt(yytext());
-    return new Symbol(sym.NUMBER, aux); 
-    }
-{STRING}     { return new Symbol(sym.STRING); }
-
-/* Newline is the BREAK terminal */
-"\n"         { return new Symbol(sym.BREAK); }
-
-/* Ignore whitespace */
-{WHITESPACE} { System.err.println("Illegal character: <" + yytext() + ">"); }
-
-/* Report other characters as errors */
-.            { System.err.println("Illegal character: <" + yytext() + ">"); }
+{Digito}    { return new Symbol(sym.NUM, yytext()); }
+{Id}        { return new Symbol(sym.ID, yytext()); }
+{Espaco}    { /* Ignora */ }
+.           { throw new Error("Caractere inválido: " + yytext()); }

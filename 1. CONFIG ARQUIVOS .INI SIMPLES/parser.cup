@@ -1,0 +1,47 @@
+import  java_cup.runtime.*;
+import java.util.HashMap;
+
+terminal IDENTIFIER, ASSIGN, VAR;
+terminal int INTEGER;
+terminal String STRING;
+terminal boolean BOOLEAN;
+
+non terminal valor;
+non terminal HashMap secao;
+non terminal HashMap lista_propriedades;
+non terminal Object[] propriedade;
+
+
+
+secao ::= secao:sec IDENTIFIER:id lista_propriedades:list
+    {:
+      sec.put(id, list);
+      RESULT = sec;
+    :}
+ | IDENTIFIER:id lista_propriedades:list 
+    {:
+        RESULT = new HashMap<>();
+        RESULT.put(id, list);
+    :}
+ ;
+
+lista_propriedades ::= lista_propriedades:list propriedade:prop
+{:   
+   list.put(prop[0], prop[1]);
+   RESULT = list;
+:}
+ | propriedade:prop 
+ {:
+    RESULT = new HashMap<>();    
+    RESULT.put(prop[0], prop[1]);
+:}
+ ;
+
+propriedade ::= VAR:var ASSIGN valor:v 
+    {: RESULT = new Object[2];
+        RESULT[0] = var;
+        RESULT[1] = v;    
+     :}
+;
+
+valor ::= STRING:s {: RESULT = s; :}  | BOOLEAN :b {: RESULT = b; :} | INTEGER:i {: RESULT = i; :};

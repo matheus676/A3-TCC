@@ -1,0 +1,77 @@
+import java_cup.runtime.*;
+
+terminal PLUS, MINUS, MULT, DIV, POWER, LPAREN, RPAREN, SEMI;
+terminal String NUMBER; // Recebemos o número como String do Flex
+terminal UMINUS;
+// O resultado de cada pedaço da expressão será uma String (o código RPN)
+non terminal String expr, expr_list;
+
+// --- PRECEDÊNCIA (O Pulo do Gato) ---
+// Ordem: de baixo para cima (maior prioridade embaixo)
+precedence left PLUS, MINUS;  // Soma e subtr têm menor prioridade. Associatividade à Esquerda (1-2-3 = (1-2)-3)
+precedence left MULT, DIV;    // Mult e div têm maior prioridade.
+precedence right POWER;
+precedence right UMINUS;
+
+start with expr_list;
+
+// Permite processar várias expressões separadas por ponto e vírgula
+expr_list ::= expr_list expr:e SEMI {: 
+                System.out.println("RPN: " + e); 
+              :}
+            | expr:e SEMI {: 
+                System.out.println("RPN: " + e); 
+              :};
+
+// --- GRAMÁTICA ---
+
+expr ::= 
+      // Regra da Soma
+      expr:e1 PLUS expr:e2
+      {: 
+         // Infixa: e1 + e2  ->  Posfixa: e1 e2 +
+         RESULT = e1 + " " + e2 + " +"; 
+      :}
+      
+    | // Regra da Subtração
+      expr:e1 MINUS expr:e2
+      {: 
+         RESULT = e1 + " " + e2 + " -"; 
+      :}
+      
+    | // Regra da Multiplicação
+      expr:e1 MULT expr:e2
+      {: 
+         RESULT = e1 + " " + e2 + " *"; 
+      :}
+      
+    | // Regra da Divisão
+      expr:e1 DIV expr:e2
+      {: 
+         RESULT = e1 + " " + e2 + " /"; 
+      :}
+      
+    | // Regra da Potenciação
+      expr:e1 POWER expr:e2
+      {: 
+         RESULT = e1 + " " + e2 + " ^"; 
+      :}
+
+    | // Regra dos Parênteses
+      LPAREN expr:e RPAREN
+      {: 
+         // Parênteses somem na notação polonesa, pois a ordem já fica explícita!
+         RESULT = e; 
+      :}
+
+    | // Regra do menos Unário
+     MINUS expr:e 
+      {: 
+         RESULT = e + " NEG"; 
+      :}
+       %prec UMINUS            
+    | // Caso base: Número
+      NUMBER:n
+      {: 
+         RESULT = n; 
+      :};

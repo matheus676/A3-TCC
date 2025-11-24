@@ -1,0 +1,112 @@
+import java_cup.runtime.*;
+
+// --- CÓDIGO JAVA AUXILIAR ---
+// Define a classe que transporta os dados pela árvore sintática
+action code {:
+    
+    class NodeContent {
+        StringBuilder attributes = new StringBuilder(); // Acumula: id="1" type="text"
+        StringBuilder body = new StringBuilder();       // Acumula: <nome>Ana</nome>
+
+        // Método para juntar dois nós (usado em listas de membros)
+        public void merge(NodeContent other) {
+            this.attributes.append(other.attributes);
+            this.body.append(other.body);
+        }
+        
+        // Construtor vazio
+        public NodeContent() {}
+        
+        // Construtor rápido para conteúdo simples
+        public NodeContent(String content) {
+            this.body.append(content);
+        }
+    }
+:}
+
+// --- TERMINAIS (Vindos do JFlex) ---
+terminal LBRACE, RBRACE, LBRACKET, RBRACKET, COLON, COMMA;
+terminal String STRING, NUMBER, BOOLEAN, NULL;
+
+// --- NÃO-TERMINAIS ---
+// Note que agora quase tudo retorna 'NodeContent' em vez de 'String'
+non terminal NodeContent object, members, pair, array, elements, value;
+non terminal json_file;
+// --- GRAMÁTICA ---
+
+start with json_file;
+
+// 1. Regra Inicial
+json_file ::= value:v {: 
+    // Monta o XML final envolvendo tudo numa tag raiz
+    // Usamos v.attributes (caso a raiz tenha metadados) e v.body
+    String finalXml = "<root" + v.attributes + ">\n" + v.body + "\n</root>";
+    System.out.println(finalXml);
+    // RESULT pode ser usado se você quiser retornar o objeto para o Java main
+    RESULT = finalXml; 
+:};
+
+// 2. Valores (Tipos de dados do JSON)
+value ::= STRING:s   {: RESULT = new NodeContent(s); :}
+        | NUMBER:n   {: RESULT = new NodeContent(n); :}
+        | BOOLEAN:b  {: RESULT = new NodeContent(b); :}
+        | NULL:n     {: RESULT = new NodeContent("null"); :}
+        | object:o   {: RESULT = o; :}
+        | array:a    {: RESULT = a; :};
+
+// 3. Objeto (Onde a mágica dos atributos acontece)
+object ::= LBRACE members:m RBRACE {: RESULT = m; :}
+         | LBRACE RBRACE           {: RESULT = new NodeContent(); :};
+
+// Recursão para múltiplos membros: "a":1, "b":2
+members ::= pair:p COMMA members:ms {: 
+               // Junta o par atual com o resto. 
+               // Se 'p' for atributo, vai para .attributes. Se for tag, vai para .body
+               p.merge(ms); 
+               RESULT = p; 
+           :}
+          | pair:p {: RESULT = p; :};
+
+// 4. Par Chave-Valor (A lógica principal)
+pair ::= STRING:key COLON value:val {: 
+    NodeContent node = new NodeContent();
+
+    if (key.startsWith("@")) {
+        // CASO A: É um Atributo (ex: "@id": 10)
+        // Pegamos o nome sem o @
+        String attrName = key.substring(1);
+        // Adicionamos na lista de atributos: nome="valor"
+        // Nota: val.body contém o valor primitivo (10)
+        node.attributes.append(" " + attrName + "=\"" + val.body.toString() + "\"");
+        // O body fica vazio, pois atributo não gera tag visual
+    } else {
+        // CASO B: É um Elemento (ex: "usuario": {...})
+        // Aqui consumimos os atributos que vieram do filho (val.attributes)
+        // Ex: <usuario id="1"> ... </usuario>
+        
+        node.body.append("<" + key + val.attributes + ">");
+        node.body.append(val.body);
+        node.body.append("</" + key + ">\n");
+        
+        // Nota: node.attributes fica vazio, pois este par JÁ VIROU uma tag fechada.
+        // Ele não é atributo do pai dele.
+    }
+    RESULT = node;
+:};
+
+// 5. Arrays
+array ::= LBRACKET elements:e RBRACKET {: RESULT = e; :}
+        | LBRACKET RBRACKET            {: RESULT = new NodeContent(); :};
+
+elements ::= value:v COMMA elements:es {: 
+               NodeContent item = new NodeContent();
+               // Embrulha cada item em <item>
+               item.body.append("<item>" + v.body + "</item>\n");
+               item.merge(es);
+               RESULT = item; 
+           :}
+           | value:v {: 
+               NodeContent item = new NodeContent();
+               item.body.append("<item>" + v.body + "</item>");
+               RESULT = item; 
+           :};

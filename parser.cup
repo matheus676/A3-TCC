@@ -1,25 +1,78 @@
-import  java_cup.runtime.*;
+import java_cup.runtime.*;
 
-/* TERMINAIS */
-terminal Z, BOOLEAN, IDENTIFIER, NUMBER, BREAK, STRING, ASSIGN;
+terminal SE, ENTAO, SENAO; //ENQUANTO, FACA, INICIO, FIM;
+terminal MAIS, MAIOR, IGUAL, AP, FP, PV;
+terminal String ID, NUM;
 
-/* NÃO TERMINAIS */
-non terminal lista_secao, secao, titulo_secao, lista_propriedades, titulo_prop, valor_prop, propriedade;
+non terminal programa, lista_cmds, cmd, valor;
+non terminal String expr, condicao;
 
-start with lista_secao;
+start with programa;
 
-/* GRAMÁTICA */
-lista_secao ::= lista_secao secao | secao;
+programa ::= lista_cmds {: 
+    // Ao final, imprime tudo
+    System.out.println("--- CÓDIGO INTERMEDIÁRIO GERADO ---");
+    for(Quadrupla q : Gerador.codigo) {
+        System.out.println(q);
+    }
+:};
 
-/* AQUI ESTÁ A CORREÇÃO: Adicionando o BREAK depois do título */
-secao ::= titulo_secao BREAK lista_propriedades;
+lista_cmds ::= lista_cmds cmd | cmd;
 
-lista_propriedades ::= lista_propriedades propriedade | propriedade;
+// --- COMANDOS ---
 
-propriedade ::= titulo_prop ASSIGN valor_prop BREAK;
+cmd ::= 
+    // Atribuição: x = 10;
+    ID:id IGUAL expr:e PV {: 
+        Gerador.add("=", e, id); 
+    :}
+    
+    // Bloco IF / ELSE (O mais complexo!)
+    | SE AP condicao:c FP ENTAO 
+      {: 
+         // Ação Embutida 1: Antes de entrar no THEN
+         // 'c' contém o nome da variável temporária com o resultado do teste (ex: t1)
+         String labelElse = Gerador.novoLabel();
+         String labelFim = Gerador.novoLabel();
+         
+         // Se t1 for falso, pule para o ELSE
+         Gerador.add("IF_FALSE", c, labelElse);
+         
+         // Guardamos os labels na pilha do parser (hack) ou passamos para regras abaixo.
+         // Para simplificar este exemplo didático, vamos usar variáveis globais no parser
+         // (Em produção, você criaria uma classe de contexto para passar esses labels)
+         parser.lElse = labelElse;
+         parser.lFim = labelFim;
+      :}
+      cmd 
+      {: 
+         // Ação Embutida 2: Fim do bloco THEN
+         Gerador.add("GOTO", parser.lFim); // Pula o Else
+         Gerador.add("LABEL", parser.lElse); // Marca onde começa o Else
+      :}
+      SENAO cmd 
+      {: 
+         // Ação Embutida 3: Fim do bloco ELSE
+         Gerador.add("LABEL", parser.lFim); // Marca o fim de tudo
+      :};
 
-titulo_prop ::= IDENTIFIER;
 
-valor_prop ::= STRING | BOOLEAN | NUMBER;
+// --- EXPRESSÕES ---
 
-titulo_secao ::= Z IDENTIFIER;
+// Expressão Aritmética Simples
+expr ::= valor:e1 MAIS valor:e2 {: 
+           String temp = Gerador.novaTemp();
+           Gerador.add("+", e1, e2, temp);
+           RESULT = temp; 
+       :}
+       ;
+
+valor ::= NUM:n {: RESULT = n; :}
+         | ID:id {: RESULT = id; :};
+
+// Expressão Lógica (Condição)
+condicao ::= expr:e1 MAIOR expr:e2 {: 
+               String temp = Gerador.novaTemp();
+               Gerador.add(">", e1, e2, temp);
+               RESULT = temp; 
+           :};

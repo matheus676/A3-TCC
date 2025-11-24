@@ -1,1 +1,1 @@
-zhello
+se (x > 10) entao y = 5 senao y = 0

@@ -1,0 +1,92 @@
+<root>
+<name>typescript</name>
+<author>Microsoft Corp.</author>
+<homepage>https://www.typescriptlang.org/</homepage>
+<version>5.8.3</version>
+<license>Apache-2.0</license>
+<description>TypeScript is a language for application scale JavaScript development</description>
+<keywords><item>TypeScript</item>
+<item>Microsoft</item>
+<item>compiler</item>
+<item>language</item>
+<item>javascript</item></keywords>
+<bugs><url>https://github.com/microsoft/TypeScript/issues</url>
+</bugs>
+<repository><type>git</type>
+<url>https://github.com/microsoft/TypeScript.git</url>
+</repository>
+<main>./lib/typescript.js</main>
+<typings>./lib/typescript.d.ts</typings>
+<bin><tsc>./bin/tsc</tsc>
+<tsserver>./bin/tsserver</tsserver>
+</bin>
+<engines><node>>=14.17</node>
+</engines>
+<files><item>bin</item>
+<item>lib</item>
+<item>!lib/enu</item>
+<item>LICENSE.txt</item>
+<item>README.md</item>
+<item>SECURITY.md</item>
+<item>ThirdPartyNoticeText.txt</item>
+<item>!**/.gitattributes</item></files>
+<devDependencies dprint/formatter="^0.4.1" dprint/typescript="0.93.3" esfx/canceltoken="^1.0.0" eslint/js="^9.17.0" octokit/rest="^21.0.2" types/chai="^4.3.20" types/diff="^5.2.3" types/minimist="^1.2.5" types/mocha="^10.0.10" types/ms="^0.7.34" types/node="latest" types/source-map-support="^0.5.10" types/which="^3.0.4" typescript-eslint/rule-tester="^8.18.1" typescript-eslint/type-utils="^8.18.1" typescript-eslint/utils="^8.18.1"><azure-devops-node-api>^14.1.0</azure-devops-node-api>
+<c8>^10.1.3</c8>
+<chai>^4.5.0</chai>
+<chalk>^4.1.2</chalk>
+<chokidar>^3.6.0</chokidar>
+<diff>^5.2.0</diff>
+<dprint>^0.47.6</dprint>
+<esbuild>^0.24.0</esbuild>
+<eslint>^9.17.0</eslint>
+<eslint-formatter-autolinkable-stylish>^1.4.0</eslint-formatter-autolinkable-stylish>
+<eslint-plugin-regexp>^2.7.0</eslint-plugin-regexp>
+<fast-xml-parser>^4.5.1</fast-xml-parser>
+<glob>^10.4.5</glob>
+<globals>^15.13.0</globals>
+<hereby>^1.10.0</hereby>
+<jsonc-parser>^3.3.1</jsonc-parser>
+<knip>^5.41.0</knip>
+<minimist>^1.2.8</minimist>
+<mocha>^10.8.2</mocha>
+<mocha-fivemat-progress-reporter>^0.1.0</mocha-fivemat-progress-reporter>
+<monocart-coverage-reports>^2.11.4</monocart-coverage-reports>
+<ms>^2.1.3</ms>
+<playwright>^1.49.1</playwright>
+<source-map-support>^0.5.21</source-map-support>
+<tslib>^2.8.1</tslib>
+<typescript>^5.7.2</typescript>
+<typescript-eslint>^8.18.1</typescript-eslint>
+<which>^3.0.1</which>
+</devDependencies>
+<overrides><typescript@*>$typescript</typescript@*>
+</overrides>
+<scripts><test>hereby runtests-parallel --light=false</test>
+<test:eslint-rules>hereby run-eslint-rules-tests</test:eslint-rules>
+<build>npm run build:compiler && npm run build:tests</build>
+<build:compiler>hereby local</build:compiler>
+<build:tests>hereby tests</build:tests>
+<build:tests:notypecheck>hereby tests --no-typecheck</build:tests:notypecheck>
+<clean>hereby clean</clean>
+<gulp>hereby</gulp>
+<lint>hereby lint</lint>
+<knip>hereby knip</knip>
+<format>dprint fmt</format>
+<setup-hooks>node scripts/link-hooks.mjs</setup-hooks>
+</scripts>
+<browser><fs>false</fs>
+<os>false</os>
+<path>false</path>
+<crypto>false</crypto>
+<buffer>false</buffer>
+<source-map-support>false</source-map-support>
+<inspector>false</inspector>
+<perf_hooks>false</perf_hooks>
+</browser>
+<packageManager>npm@8.19.4</packageManager>
+<volta><node>20.1.0</node>
+<npm>8.19.4</npm>
+</volta>
+<gitHead>68cead182cc24afdc3f1ce7c8ff5853aba14b65a</gitHead>
+
+</root>

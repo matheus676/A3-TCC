@@ -6,25 +6,33 @@
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int Z = 2;
-  public static final int NUMBER = 5;
-  public static final int BOOLEAN = 3;
+  public static final int NUM = 12;
+  public static final int MAIS = 5;
+  public static final int SE = 2;
+  public static final int FP = 9;
+  public static final int MAIOR = 6;
+  public static final int PV = 10;
   public static final int EOF = 0;
-  public static final int STRING = 7;
-  public static final int ASSIGN = 8;
+  public static final int ID = 11;
+  public static final int SENAO = 4;
+  public static final int IGUAL = 7;
   public static final int error = 1;
-  public static final int IDENTIFIER = 4;
-  public static final int BREAK = 6;
+  public static final int ENTAO = 3;
+  public static final int AP = 8;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
-  "Z",
-  "BOOLEAN",
-  "IDENTIFIER",
-  "NUMBER",
-  "BREAK",
-  "STRING",
-  "ASSIGN"
+  "SE",
+  "ENTAO",
+  "SENAO",
+  "MAIS",
+  "MAIOR",
+  "IGUAL",
+  "AP",
+  "FP",
+  "PV",
+  "ID",
+  "NUM"
   };
 }
 
