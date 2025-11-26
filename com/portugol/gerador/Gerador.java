@@ -1,3 +1,5 @@
+package com.portugol.gerador;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,5 +24,10 @@ public class Gerador {
     // Sobrecarga para operações unárias ou labels
     public static void add(String op, String arg1, String res) {
         add(op, arg1, null, res);
+    }
+
+    // Sobrecarga para GOTO, LABEL (apenas op e res)
+    public static void add(String op, String res) {
+        add(op, null, null, res);
     }
 }

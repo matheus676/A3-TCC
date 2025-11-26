@@ -1,11 +1,19 @@
+package com.portugol;
 import java_cup.runtime.*;
+
+parser code {:
+    // Injeta estas variáveis dentro da classe 'parser' gerada
+    public String lElse, lFim;
+:};
 
 terminal SE, ENTAO, SENAO; //ENQUANTO, FACA, INICIO, FIM;
 terminal MAIS, MAIOR, IGUAL, AP, FP, PV;
 terminal String ID, NUM;
 
-non terminal programa, lista_cmds, cmd, valor;
+non terminal programa, lista_cmds, cmd;
 non terminal String expr, condicao;
+
+precedence left MAIS;
 
 start with programa;
 
@@ -60,15 +68,13 @@ cmd ::=
 // --- EXPRESSÕES ---
 
 // Expressão Aritmética Simples
-expr ::= valor:e1 MAIS valor:e2 {: 
+expr ::= expr:e1 MAIS expr:e2 {: 
            String temp = Gerador.novaTemp();
            Gerador.add("+", e1, e2, temp);
            RESULT = temp; 
        :}
-       ;
-
-valor ::= NUM:n {: RESULT = n; :}
-         | ID:id {: RESULT = id; :};
+       | NUM:n {: RESULT = n; :}
+       | ID:id {: RESULT = id; :};
 
 // Expressão Lógica (Condição)
 condicao ::= expr:e1 MAIOR expr:e2 {: 

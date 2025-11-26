@@ -1,4 +1,4 @@
-package com.portugol;
+package com.portugol.parser;
 import java_cup.runtime.Symbol;
 
 %%
@@ -7,6 +7,7 @@ import java_cup.runtime.Symbol;
 %cup
 %line
 %column
+%public
 
 Digito = [0-9]+
 Id = [a-zA-Z]+

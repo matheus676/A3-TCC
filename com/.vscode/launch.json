@@ -1,0 +1,17 @@
+ {
+      "version": "0.2.0",
+      "configurations": [
+          {
+              "type": "java",
+              "name": "Debug Portugol",
+              "request": "launch",
+              "mainClass": "com.portugol.Main",
+              "args": ["tst.txt"],
+              "cwd": "${workspaceFolder}",
+              "classPaths": [
+                  "${workspaceFolder}/java_cup/java-cup-11b-runtime.jar",
+                  "." 
+              ]
+          }
+      ]
+  }                                                                                                                                                                

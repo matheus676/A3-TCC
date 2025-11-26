@@ -1,3 +1,5 @@
+package com.portugol.gerador;
+
 public class Quadrupla {
     String op, arg1, arg2, res;
 
