@@ -5,6 +5,7 @@ import com.portugol.parser.Scanner;
 import com.portugol.parser.parser;
 import com.portugol.ast.Node;
 import com.portugol.visitor.TacGerador;
+import com.portugol.visitor.SemanticVisitor;
 import com.portugol.gerador.Gerador;
 import com.portugol.gerador.Quadrupla;
 
@@ -16,6 +17,9 @@ public class Main {
         // 1. O Parser retorna a Árvore (AST)
         Node raiz = (Node) p.parse().value;
         
+        SemanticVisitor semantico = new SemanticVisitor();
+        raiz.accept(semantico);
+
         // 2. O Visitor percorre a árvore gerando código
         TacGerador gerador = new TacGerador();
         raiz.accept(gerador);
