@@ -7,6 +7,7 @@ import com.portugol.visitor.Visitor;
 
 public class SemanticVisitor implements Visitor {
     private Set<String> tabelaSimbolos = new HashSet<>();
+    private boolean encontrouInicio;
 
     @Override
     public void visit(Bloco n) {
@@ -17,8 +18,8 @@ public class SemanticVisitor implements Visitor {
 
     @Override
     public void visit(Atribuicao n) {
-        n.valor.accept(this); 
-        tabelaSimbolos.add(n.id); 
+        n.valor.accept(this);
+        tabelaSimbolos.add(n.id);
     }
 
     @Override
@@ -29,21 +30,23 @@ public class SemanticVisitor implements Visitor {
     }
 
     @Override
-    public void visit(ExpressaoBinaria n) { 
-        n.esq.accept(this); 
-        n.dir.accept(this); 
+    public void visit(ExpressaoBinaria n) {
+        n.esq.accept(this);
+        n.dir.accept(this);
     }
 
     @Override
-    public void visit(Numero n) { /* Nada a fazer */ }
-    
+    public void visit(Numero n) {
+        /* Nada a fazer */ }
+
     @Override
     public void visit(CondicaoSe n) {
         n.condicao.accept(this);
         n.blocoEntao.accept(this);
-        if (n.blocoSenao != null) n.blocoSenao.accept(this);
+        if (n.blocoSenao != null)
+            n.blocoSenao.accept(this);
     }
-    
+
     @Override
     public void visit(Enquanto n) {
         n.condicao.accept(this);
@@ -57,28 +60,39 @@ public class SemanticVisitor implements Visitor {
         n.incremento.accept(this);
         n.corpo.accept(this);
     }
-    
+
     @Override
-    public void visit(FuncaoChamada n) {}
+    public void visit(FuncaoChamada n) {
+    }
 
     @Override
     public void visit(FuncaoDeclaracao n) {
-    // 1. Limpa ou cria novo escopo para a função
-    tabelaSimbolos.clear(); 
+        // 1. Verificação da Função Principal
+        if (n.nome.equals("inicio")) {
+            encontrouInicio = true;
+            
+            // Regra Extra: 'inicio' não pode ter parâmetros
+            if (!n.parametros.isEmpty()) {
+                throw new RuntimeException("Erro Semântico: A função 'inicio' não deve receber parâmetros.");
+            }
+        }
 
-    // 2. Registra os parâmetros como variáveis válidas
-    for (String param : n.parametros) {
-        tabelaSimbolos.add(param);
+        // 2. Lógica de Escopo (que você já fez)
+        tabelaSimbolos.clear(); 
+        for (String param : n.parametros) {
+            tabelaSimbolos.add(param);
+        }
+        n.corpo.accept(this);
     }
 
-    // 3. Valida o corpo (agora os params já existem)
-    n.corpo.accept(this);
-}
-
     @Override
-    public void visit(Retorno n) {}
+    public void visit(Retorno n) {
+    }
 
+    public void concluir() {
+        if (!encontrouInicio) {
+            throw new RuntimeException("Erro Semântico: O programa não possui uma função 'inicio()' declarada.");
+        }
+    }
 
-
-    
 }

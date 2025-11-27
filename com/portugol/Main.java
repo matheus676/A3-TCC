@@ -25,6 +25,7 @@ public class Main {
         for (FuncaoDeclaracao f : funcoes) {
             f.accept(semantico);
         }
+        semantico.concluir();
 
         TacGerador gerador = new TacGerador();
 
