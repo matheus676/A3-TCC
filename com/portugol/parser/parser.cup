@@ -43,13 +43,23 @@ lista_funcoes ::= lista_funcoes:l funcao:f
                    RESULT = l; 
                 :};
 
-funcao ::= FUNCAO ID:nome AP params:p FP FACA cmd:corpo
+funcao ::= FUNCAO ID:nome AP params:p FP FACA lista_cmds:corpo 
          {: 
-            // O parser atual usa 'cmd' que retorna 'Node' ou 'Bloco'
-            // Se 'cmd' retornar 'CondicaoSe' ou algo unico, precisamos garantir que seja um Bloco.
-            // O ideal é que o corpo da função seja um Bloco { ... }
-            RESULT = new FuncaoDeclaracao(nome, p, (Bloco)corpo); 
+            RESULT = new FuncaoDeclaracao(nome, p, corpo); 
          :};
+
+lista_cmds ::= lista_cmds:l cmd:c 
+             {: 
+                l.adicionar(c);
+                RESULT = l; 
+             :}
+             |
+             cmd:c 
+             {: 
+                Bloco b = new Bloco();
+                b.adicionar(c);
+                RESULT = b; 
+             :};
 
 params ::= ID:id VIRGULA params:p 
          {: p.add(0, id); RESULT = p; :}

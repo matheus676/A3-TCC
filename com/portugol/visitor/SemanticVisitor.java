@@ -62,7 +62,18 @@ public class SemanticVisitor implements Visitor {
     public void visit(FuncaoChamada n) {}
 
     @Override
-    public void visit(FuncaoDeclaracao n) {}
+    public void visit(FuncaoDeclaracao n) {
+    // 1. Limpa ou cria novo escopo para a função
+    tabelaSimbolos.clear(); 
+
+    // 2. Registra os parâmetros como variáveis válidas
+    for (String param : n.parametros) {
+        tabelaSimbolos.add(param);
+    }
+
+    // 3. Valida o corpo (agora os params já existem)
+    n.corpo.accept(this);
+}
 
     @Override
     public void visit(Retorno n) {}
