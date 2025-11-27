@@ -2,11 +2,12 @@ package com.portugol.parser;
 
 import com.portugol.ast.*;
 import java_cup.runtime.*;
+import java.util.List;
 import java.util.ArrayList;
 
 // 1. Definição dos Terminais
 terminal SE, ENTAO, SENAO;
-terminal FACA, ENQUANTO, PARA, MAIS, MENOS, MENOR, MULT, DIV, MAIOR, IGUAL, AP, FP, PV;
+terminal FUNCAO, RETORNE, VIRGULA, FACA, ENQUANTO, PARA, MAIS, MENOS, MENOR, MULT, DIV, MAIOR, IGUAL, AP, FP, PV;
 terminal String ID, NUM;
 
 // 2. Definição dos Não-Terminais
@@ -16,6 +17,11 @@ non terminal Atribuicao atribuicao;
 non terminal Node cmd;
 non terminal Expressao expr, condicao;
 
+non terminal FuncaoDeclaracao funcao;
+non terminal List<FuncaoDeclaracao> lista_funcoes;
+non terminal List<String> params;
+non terminal List<Expressao> args;
+
 // 3. Precedência
 precedence left ENTAO;
 precedence left SENAO;
@@ -24,25 +30,49 @@ precedence left MAIOR;
 precedence left MAIS, MENOS;
 precedence left MULT, DIV;
 
-start with programa;
+start with lista_funcoes;
 
 // 4. Gramática
 
-// O programa retorna a raiz da árvore (um Bloco)
-programa ::= lista_cmds:l {: RESULT = l; :};
+lista_funcoes ::= lista_funcoes:l funcao:f 
+                {: l.add(f); RESULT = l; :}
+                | funcao:f 
+                {: 
+                   List<FuncaoDeclaracao> l = new ArrayList<>();
+                   l.add(f); 
+                   RESULT = l; 
+                :};
 
-lista_cmds ::= lista_cmds:l cmd:c 
-             {: 
-                l.adicionar(c);
-                RESULT = l; 
-             :}
-             |
-             cmd:c 
-             {: 
-                Bloco b = new Bloco();
-                b.adicionar(c);
-                RESULT = b; 
-             :};
+funcao ::= FUNCAO ID:nome AP params:p FP FACA cmd:corpo
+         {: 
+            // O parser atual usa 'cmd' que retorna 'Node' ou 'Bloco'
+            // Se 'cmd' retornar 'CondicaoSe' ou algo unico, precisamos garantir que seja um Bloco.
+            // O ideal é que o corpo da função seja um Bloco { ... }
+            RESULT = new FuncaoDeclaracao(nome, p, (Bloco)corpo); 
+         :};
+
+params ::= ID:id VIRGULA params:p 
+         {: p.add(0, id); RESULT = p; :}
+         | ID:id 
+         {: 
+            List<String> l = new ArrayList<>();
+            l.add(id);
+            RESULT = l; 
+         :}
+         | /* Vazio */ 
+         {: RESULT = new ArrayList<String>(); :};
+
+args ::= expr:e VIRGULA args:a 
+       {: a.add(0, e); RESULT = a; :}
+       | expr:e 
+       {: 
+          List<Expressao> l = new ArrayList<>();
+          l.add(e);
+          RESULT = l; 
+       :}
+       | /* Vazio */ 
+       {: RESULT = new ArrayList<Expressao>(); :};         
+
 
 atribuicao ::= ID:id IGUAL expr:e 
              {: RESULT = new Atribuicao(id, e); :}
@@ -50,6 +80,9 @@ atribuicao ::= ID:id IGUAL expr:e
              {: RESULT = new Atribuicao(id, c); :};
 
 cmd ::= 
+   RETORNE expr:e PV 
+      {: RESULT = new Retorno(e); :}
+    |   
     // Atribuição simples
     atribuicao:a PV 
     {: 
@@ -94,6 +127,9 @@ expr ::= expr:e1 MAIS expr:e2
        {: 
           RESULT = new Numero(n); 
        :}
+       |
+       ID:nome AP args:a FP 
+       {: RESULT = new FuncaoChamada(nome, a); :}
        | ID:id 
        {: 
           RESULT = new Variavel(id); 

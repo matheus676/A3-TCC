@@ -10,4 +10,7 @@ public interface Visitor {
     void visit(Bloco n);
     void visit(Enquanto n);
     void visit(Para n);
+    void visit(FuncaoDeclaracao n);
+    void visit(Retorno n);
+    void visit(FuncaoChamada n);
 }

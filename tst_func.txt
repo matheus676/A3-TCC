@@ -1,0 +1,3 @@
+funcao soma(a, b) faca 
+    retorne a + b;
+;

@@ -21,6 +21,9 @@ Espaco = [ \t\r\n]+
 "enquanto"  { return new Symbol(sym.ENQUANTO); }
 "para"      { return new Symbol(sym.PARA); }
 "faca"      { return new Symbol(sym.FACA); }
+"funcao"    { return new Symbol(sym.FUNCAO); }
+"retorne"   { return new Symbol(sym.RETORNE); }
+
 "+"         { return new Symbol(sym.MAIS); }
 "-"       { return new Symbol(sym.MENOS); }
 "*"       { return new Symbol(sym.MULT); } 
@@ -30,6 +33,7 @@ Espaco = [ \t\r\n]+
 "="         { return new Symbol(sym.IGUAL); }
 "("         { return new Symbol(sym.AP); }
 ")"         { return new Symbol(sym.FP); }
+","         { return new Symbol(sym.VIRGULA); }
 ";"         { return new Symbol(sym.PV); }
 
 {Digito}    { return new Symbol(sym.NUM, yytext()); }

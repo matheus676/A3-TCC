@@ -57,6 +57,15 @@ public class SemanticVisitor implements Visitor {
         n.incremento.accept(this);
         n.corpo.accept(this);
     }
+    
+    @Override
+    public void visit(FuncaoChamada n) {}
+
+    @Override
+    public void visit(FuncaoDeclaracao n) {}
+
+    @Override
+    public void visit(Retorno n) {}
 
 
 

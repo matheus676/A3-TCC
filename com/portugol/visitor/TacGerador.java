@@ -114,4 +114,43 @@ public class TacGerador implements Visitor {
         // 7. Saída do loop
         Gerador.add("LABEL", lFim);
     }
+
+    @Override
+    public void visit(FuncaoDeclaracao n) {
+        // Gera o Label da função
+        Gerador.add("LABEL", n.nome);
+        
+        // (Opcional) Em TAC puro, costuma-se fazer "POP" dos parametros
+        // Mas para simplificar, apenas assumimos que as variaveis n.parametros existem
+        
+        n.corpo.accept(this);
+        
+        // Retorno padrão vazio caso o usuário esqueça
+        Gerador.add("RETURN", "0", null, null);
+    }
+
+    @Override
+    public void visit(Retorno n) {
+        n.expr.accept(this);
+        Gerador.add("RETURN", n.expr.tempResult, null, null);
+    }
+
+    @Override
+    public void visit(FuncaoChamada n) {
+        // 1. Calcula e empilha cada argumento
+        for (Expressao arg : n.argumentos) {
+            arg.accept(this);
+            // Instrução PARAM indica que é um argumento para a próxima chamada
+            Gerador.add("PARAM", arg.tempResult, null, null);
+        }
+
+        // 2. Faz a chamada
+        String temp = Gerador.novaTemp();
+        String qtdArgs = String.valueOf(n.argumentos.size());
+        
+        // Instrução CALL: nome_funcao, qtd_args, variavel_destino
+        Gerador.add("CALL", n.nome, qtdArgs, temp);
+        
+        n.tempResult = temp;
+    }
 }
