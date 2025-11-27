@@ -27,7 +27,7 @@ Espaco = [ \t\r\n]+
 "*"       { return new Symbol(sym.MULT); } 
 "/"       { return new Symbol(sym.DIV); }
 ">"         { return new Symbol(sym.MAIOR); }
-//"<"         { return new Symbol(sym.MENOR); }
+"<"         { return new Symbol(sym.MENOR); }
 "="         { return new Symbol(sym.IGUAL); }
 "("         { return new Symbol(sym.AP); }
 ")"         { return new Symbol(sym.FP); }

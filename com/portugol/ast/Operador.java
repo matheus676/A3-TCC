@@ -5,7 +5,8 @@ public enum Operador {
     SUB("-"), 
     MULT("*"), 
     DIV("/"), 
-    MAIOR(">");
+    MAIOR(">"),
+    MENOR("<");
 
     public final String simbolo;
     

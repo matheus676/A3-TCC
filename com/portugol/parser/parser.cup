@@ -94,4 +94,9 @@ expr ::= expr:e1 MAIS expr:e2
        :};
 
 condicao ::= expr:e1 MAIOR expr:e2 
-           {: RESULT = new ExpressaoBinaria(e1, e2, Operador.MAIOR); :};
+           {: RESULT = new ExpressaoBinaria(e1, e2, Operador.MAIOR); 
+           :}
+           | expr:e1 MENOR expr:e2 
+           {: RESULT = new ExpressaoBinaria(e1, e2, Operador.MENOR); 
+           :}
+           ;

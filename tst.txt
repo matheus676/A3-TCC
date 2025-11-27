@@ -1,2 +1,3 @@
-se (x > 0) entao 
-    y = 5 + 1;
+se (x < 0) entao 
+    y = 2;   
+senao y = 4;   
