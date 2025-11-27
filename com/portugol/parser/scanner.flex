@@ -18,10 +18,9 @@ Espaco = [ \t\r\n]+
 "se"        { return new Symbol(sym.SE); }
 "entao"     { return new Symbol(sym.ENTAO); }
 "senao"     { return new Symbol(sym.SENAO); }
-/*"enquanto"  { return new Symbol(sym.ENQUANTO); }
+"enquanto"  { return new Symbol(sym.ENQUANTO); }
+"para"      { return new Symbol(sym.PARA); }
 "faca"      { return new Symbol(sym.FACA); }
-"inicio"    { return new Symbol(sym.INICIO); }
-"fim"       { return new Symbol(sym.FIM); }*/
 "+"         { return new Symbol(sym.MAIS); }
 "-"       { return new Symbol(sym.MENOS); }
 "*"       { return new Symbol(sym.MULT); } 

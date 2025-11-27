@@ -8,4 +8,6 @@ public interface Visitor {
     void visit(Numero n);
     void visit(Variavel n);
     void visit(Bloco n);
+    void visit(Enquanto n);
+    void visit(Para n);
 }

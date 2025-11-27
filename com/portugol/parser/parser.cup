@@ -6,12 +6,13 @@ import java.util.ArrayList;
 
 // 1. Definição dos Terminais
 terminal SE, ENTAO, SENAO;
-terminal MAIS, MENOS, MENOR,MULT, DIV, MAIOR, IGUAL, AP, FP, PV;
+terminal FACA, ENQUANTO, PARA, MAIS, MENOS, MENOR, MULT, DIV, MAIOR, IGUAL, AP, FP, PV;
 terminal String ID, NUM;
 
 // 2. Definição dos Não-Terminais
 // Todos retornam objetos da árvore (Node, Expressao, Bloco)
 non terminal Bloco programa, lista_cmds;
+non terminal Atribuicao atribuicao;
 non terminal Node cmd;
 non terminal Expressao expr, condicao;
 
@@ -43,20 +44,17 @@ lista_cmds ::= lista_cmds:l cmd:c
                 RESULT = b; 
              :};
 
+atribuicao ::= ID:id IGUAL expr:e 
+             {: RESULT = new Atribuicao(id, e); :}
+             | ID:id IGUAL condicao:c 
+             {: RESULT = new Atribuicao(id, c); :};
+
 cmd ::= 
     // Atribuição simples
-    ID:id IGUAL expr:e PV 
+    atribuicao:a PV 
     {: 
-        RESULT = new Atribuicao(id, e); 
-    :}
-    
-    // Atribuição com condição
-    |
-    ID:id IGUAL condicao:c PV 
-    {: 
-        RESULT = new Atribuicao(id, c); 
-    :}
-    
+        RESULT = a; 
+    :}    
     // Comando SE COM SENAO (Completo)
     |
     SE AP condicao:c FP ENTAO cmd:t SENAO cmd:e 
@@ -70,7 +68,15 @@ cmd ::=
     {: 
         // Passamos 'null' porque não existe bloco else
         RESULT = new CondicaoSe(c, t, null); 
-    :};
+    :}
+    | ENQUANTO AP condicao:c FP FACA cmd:body 
+      {: 
+        RESULT = new Enquanto(c, body); 
+      :}
+     | PARA AP atribuicao:init PV condicao:cond PV atribuicao:inc FP FACA cmd:body
+    {: 
+       RESULT = new Para(init, cond, inc, body); 
+    :}; 
 
 // Expressões
 expr ::= expr:e1 MAIS expr:e2 

@@ -62,4 +62,56 @@ public class TacGerador implements Visitor {
         }
         Gerador.add("LABEL", lFim);
     }
+
+    @Override
+    public void visit(Enquanto n) {
+        String lInicio = Gerador.novoLabel();
+        String lFim = Gerador.novoLabel();
+
+        // 1. Marca o início do loop (para podermos voltar aqui)
+        Gerador.add("LABEL", lInicio);
+
+        // 2. Calcula a condição
+        n.condicao.accept(this);
+
+        // 3. Se condição FALSA, pula para o fim (sai do loop)
+        Gerador.add("IF_FALSE", n.condicao.tempResult, lFim);
+
+        // 4. Executa o corpo do loop
+        n.corpo.accept(this);
+
+        // 5. Ao terminar o corpo, volta incondicionalmente para o início (loop)
+        Gerador.add("GOTO", lInicio);
+
+        // 6. Marca o fim (destino do IF_FALSE)
+        Gerador.add("LABEL", lFim);
+    }
+
+    @Override
+    public void visit(Para n) {
+        String lInicio = Gerador.novoLabel();
+        String lFim = Gerador.novoLabel();
+
+        // 1. Executa a inicialização (ex: i = 0) antes de tudo
+        n.inicializacao.accept(this);
+
+        // 2. Marca o início do loop
+        Gerador.add("LABEL", lInicio);
+
+        // 3. Testa a condição
+        n.condicao.accept(this);
+        Gerador.add("IF_FALSE", n.condicao.tempResult, lFim);
+
+        // 4. Executa o corpo
+        n.corpo.accept(this);
+
+        // 5. Executa o incremento (ex: i = i + 1)
+        n.incremento.accept(this);
+
+        // 6. Volta para testar a condição de novo
+        Gerador.add("GOTO", lInicio);
+
+        // 7. Saída do loop
+        Gerador.add("LABEL", lFim);
+    }
 }
