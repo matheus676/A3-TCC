@@ -19,14 +19,13 @@ public class Main {
         parser p = new parser(lexer);
 
         // 1. O Parser retorna a Árvore (AST)
-        List<Node> raiz = (List<Node>) p.parse().value;
+        List<FuncaoDeclaracao> funcoes = (List<FuncaoDeclaracao>) p.parse().value;
 
         SemanticVisitor semantico = new SemanticVisitor();
-        for (Node n : raiz) {
-            n.accept(semantico);
+        for (FuncaoDeclaracao f : funcoes) {
+            f.accept(semantico);
         }
 
-        List<FuncaoDeclaracao> funcoes = (List<FuncaoDeclaracao>) p.parse().value;
         TacGerador gerador = new TacGerador();
 
         // Gera código para todas as funções
@@ -36,5 +35,9 @@ public class Main {
 
         System.out.println("CALL inicio, 0, t_main");
         System.out.println("EXIT");
+
+        for (Quadrupla q : Gerador.codigo) {
+            System.out.println(q);
+        }
     }
 }
