@@ -2,12 +2,14 @@ package com.portugol.ast;
 
 import com.portugol.visitor.Visitor;
 
-public class Soma extends Expressao {
+public class ExpressaoBinaria extends Expressao {
     public Expressao esq, dir;
+    public Operador op;
 
-    public Soma(Expressao esq, Expressao dir) {
+    public ExpressaoBinaria(Expressao esq, Expressao dir, Operador op) {
         this.esq = esq;
         this.dir = dir;
+        this.op = op;
     }
 
     @Override

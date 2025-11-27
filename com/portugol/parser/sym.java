@@ -8,19 +8,23 @@ package com.portugol.parser;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int NUM = 12;
+  public static final int NUM = 16;
   public static final int MAIS = 5;
   public static final int SE = 2;
-  public static final int FP = 9;
-  public static final int MAIOR = 6;
-  public static final int PV = 10;
+  public static final int FP = 13;
+  public static final int MAIOR = 10;
+  public static final int MENOS = 6;
+  public static final int MENOR = 7;
+  public static final int MULT = 8;
+  public static final int PV = 14;
   public static final int EOF = 0;
-  public static final int ID = 11;
+  public static final int ID = 15;
+  public static final int DIV = 9;
+  public static final int IGUAL = 11;
   public static final int SENAO = 4;
-  public static final int IGUAL = 7;
   public static final int error = 1;
   public static final int ENTAO = 3;
-  public static final int AP = 8;
+  public static final int AP = 12;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -28,6 +32,10 @@ public class sym {
   "ENTAO",
   "SENAO",
   "MAIS",
+  "MENOS",
+  "MENOR",
+  "MULT",
+  "DIV",
   "MAIOR",
   "IGUAL",
   "AP",

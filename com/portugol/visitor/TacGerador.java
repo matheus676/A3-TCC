@@ -2,6 +2,7 @@ package com.portugol.visitor;
 
 import com.portugol.ast.*;
 import com.portugol.gerador.Gerador;
+import com.portugol.visitor.Visitor;
 
 public class TacGerador implements Visitor {
 
@@ -22,20 +23,14 @@ public class TacGerador implements Visitor {
     }
 
     @Override
-    public void visit(Soma n) {
+    public void visit(ExpressaoBinaria n) {
         n.esq.accept(this);
         n.dir.accept(this);
+        
         String temp = Gerador.novaTemp();
-        Gerador.add("+", n.esq.tempResult, n.dir.tempResult, temp);
-        n.tempResult = temp;
-    }
-
-    @Override
-    public void visit(Maior n) {
-        n.esq.accept(this);
-        n.dir.accept(this);
-        String temp = Gerador.novaTemp();
-        Gerador.add(">", n.esq.tempResult, n.dir.tempResult, temp);
+        
+        Gerador.add(n.op.simbolo, n.esq.tempResult, n.dir.tempResult, temp);
+        
         n.tempResult = temp;
     }
 

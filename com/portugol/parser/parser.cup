@@ -5,32 +5,38 @@ import java_cup.runtime.*;
 import java.util.ArrayList;
 
 // 1. Definição dos Terminais
-terminal SE, ENTAO, SENAO; 
-terminal MAIS, MAIOR, IGUAL, AP, FP, PV;
+terminal SE, ENTAO, SENAO;
+terminal MAIS, MENOS, MENOR,MULT, DIV, MAIOR, IGUAL, AP, FP, PV;
 terminal String ID, NUM;
 
-// 2. Definição dos Não-Terminais (Agora tipados com classes da AST!)
+// 2. Definição dos Não-Terminais
+// Todos retornam objetos da árvore (Node, Expressao, Bloco)
 non terminal Bloco programa, lista_cmds;
 non terminal Node cmd;
 non terminal Expressao expr, condicao;
 
 // 3. Precedência
-precedence left MAIS;
+precedence left ENTAO;
+precedence left SENAO;
+
 precedence left MAIOR;
+precedence left MAIS, MENOS;
+precedence left MULT, DIV;
 
 start with programa;
 
 // 4. Gramática
 
-// O programa retorna um Bloco contendo todos os comandos
+// O programa retorna a raiz da árvore (um Bloco)
 programa ::= lista_cmds:l {: RESULT = l; :};
 
 lista_cmds ::= lista_cmds:l cmd:c 
              {: 
-                l.adicionar(c); 
+                l.adicionar(c);
                 RESULT = l; 
              :}
-             | cmd:c 
+             |
+             cmd:c 
              {: 
                 Bloco b = new Bloco();
                 b.adicionar(c);
@@ -38,27 +44,54 @@ lista_cmds ::= lista_cmds:l cmd:c
              :};
 
 cmd ::= 
-    // Atribuição
+    // Atribuição simples
     ID:id IGUAL expr:e PV 
-    {: RESULT = new Atribuicao(id, e); :}
+    {: 
+        RESULT = new Atribuicao(id, e); 
+    :}
     
-    // Atribuição com condição (Ex: x = a > b;)
-    | ID:id IGUAL condicao:c PV 
-    {: RESULT = new Atribuicao(id, c); :}
+    // Atribuição com condição
+    |
+    ID:id IGUAL condicao:c PV 
+    {: 
+        RESULT = new Atribuicao(id, c); 
+    :}
     
-    // Comando SE
-    | SE AP condicao:c FP ENTAO cmd:t SENAO cmd:e 
-    {: RESULT = new CondicaoSe(c, t, e); :};
+    // Comando SE COM SENAO (Completo)
+    |
+    SE AP condicao:c FP ENTAO cmd:t SENAO cmd:e 
+    {: 
+        RESULT = new CondicaoSe(c, t, e); 
+    :}
 
+    // Comando SE SIMPLES (Novo!)
+    |
+    SE AP condicao:c FP ENTAO cmd:t 
+    {: 
+        // Passamos 'null' porque não existe bloco else
+        RESULT = new CondicaoSe(c, t, null); 
+    :};
 
+// Expressões
 expr ::= expr:e1 MAIS expr:e2 
-       {: RESULT = new Soma(e1, e2); :}
+       {: RESULT = new ExpressaoBinaria(e1, e2, Operador.SOMA); :}
+       
+       | expr:e1 MENOS expr:e2 
+       {: RESULT = new ExpressaoBinaria(e1, e2, Operador.SUB); :}
+       
+       | expr:e1 MULT expr:e2 
+       {: RESULT = new ExpressaoBinaria(e1, e2, Operador.MULT); :}
+       
+       | expr:e1 DIV expr:e2 
+       {: RESULT = new ExpressaoBinaria(e1, e2, Operador.DIV); :}
        | NUM:n 
-       {: RESULT = new Numero(n); :}
+       {: 
+          RESULT = new Numero(n); 
+       :}
        | ID:id 
        {: 
-          RESULT = new Variavel(id);
+          RESULT = new Variavel(id); 
        :};
 
 condicao ::= expr:e1 MAIOR expr:e2 
-           {: RESULT = new Maior(e1, e2); :};
+           {: RESULT = new ExpressaoBinaria(e1, e2, Operador.MAIOR); :};

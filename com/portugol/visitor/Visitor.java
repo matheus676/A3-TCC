@@ -2,8 +2,7 @@ package com.portugol.visitor;
 import com.portugol.ast.*;
 
 public interface Visitor {
-    void visit(Soma n);
-    void visit(Maior n);
+    void visit(ExpressaoBinaria n);
     void visit(CondicaoSe n);
     void visit(Atribuicao n);
     void visit(Numero n);
