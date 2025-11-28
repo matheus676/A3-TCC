@@ -24,6 +24,9 @@ Espaco = [ \t\r\n]+
 "funcao"    { return new Symbol(sym.FUNCAO); }
 "retorne"   { return new Symbol(sym.RETORNE); }
 "fim"       { return new Symbol(sym.FIM); }
+"inteiro"   { return new Symbol(sym.TIPO_INT); }
+"booleano"  { return new Symbol(sym.TIPO_BOOL); }
+"vazio"     { return new Symbol(sym.TIPO_VOID); }
 
 "+"         { return new Symbol(sym.MAIS); }
 "-"       { return new Symbol(sym.MENOS); }

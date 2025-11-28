@@ -24,6 +24,7 @@ parser code {:
 
 // 1. Definição dos Terminais
 terminal SE, ENTAO, SENAO;
+terminal TIPO_INT, TIPO_BOOL, TIPO_VOID;
 terminal FUNCAO, RETORNE, VIRGULA, FACA, ENQUANTO, PARA, MAIS, MENOS, MENOR, MULT, DIV, MAIOR, IGUAL, AP, FP, PV, FIM;
 terminal String ID, NUM;
 
@@ -37,13 +38,16 @@ non terminal Expressao expr, condicao;
 non terminal Programa programa;
 non terminal List<FuncaoDeclaracao> lista_funcoes;
 non terminal FuncaoDeclaracao funcao;
-non terminal List<String> params;
+non terminal List<Parametro> params;
+non terminal Parametro parametro; 
+non terminal Tipo tipo;
+non terminal Node declaracao;
 non terminal List<Expressao> args;
+
 
 // 3. Precedência
 precedence left ENTAO;
 precedence left SENAO;
-
 precedence left MAIOR;
 precedence left MAIS, MENOS;
 precedence left MULT, DIV;
@@ -64,83 +68,64 @@ lista_funcoes ::= lista_funcoes:l funcao:f
                    RESULT = l; 
                 :};
 
-funcao ::= FUNCAO ID:nome AP params:p FP FACA lista_cmds:corpo FIM
+tipo ::= TIPO_INT   {: RESULT = Tipo.INTEIRO; :}
+       | TIPO_BOOL  {: RESULT = Tipo.BOOLEANO; :}
+       | TIPO_VOID  {: RESULT = Tipo.VAZIO; :};
+
+funcao ::= FUNCAO tipo:t ID:nome AP params:p FP FACA lista_cmds:corpo FIM
          {: 
-            RESULT = new FuncaoDeclaracao(nome, p, corpo); 
+            RESULT = new FuncaoDeclaracao(t, nome, p, corpo);
          :};
 
-lista_cmds ::= lista_cmds:l cmd:c 
-             {: 
-                l.adicionar(c);
-                RESULT = l; 
-             :}
-             |
-             cmd:c 
-             {: 
-                Bloco b = new Bloco();
-                b.adicionar(c);
-                RESULT = b; 
-             :};
-
-params ::= ID:id VIRGULA params:p 
-         {: p.add(0, id); RESULT = p; :}
-         | ID:id 
+params ::= parametro:p VIRGULA params:lista 
+         {: lista.add(0, p); RESULT = lista; :}
+         | parametro:p 
          {: 
-            List<String> l = new ArrayList<>();
-            l.add(id);
+            List<Parametro> l = new ArrayList<>();
+            l.add(p);
             RESULT = l; 
          :}
          | /* Vazio */ 
-         {: RESULT = new ArrayList<String>(); :};
+         {: RESULT = new ArrayList<Parametro>(); :};
 
-args ::= expr:e VIRGULA args:a 
-       {: a.add(0, e); RESULT = a; :}
-       | expr:e 
-       {: 
-          List<Expressao> l = new ArrayList<>();
-          l.add(e);
-          RESULT = l; 
-       :}
-       | /* Vazio */ 
-       {: RESULT = new ArrayList<Expressao>(); :};         
+parametro ::= tipo:t ID:nome 
+            {: RESULT = new Parametro(t, nome); :};
 
+lista_cmds ::= lista_cmds:l cmd:c 
+             {: l.adicionar(c); RESULT = l; :}
+             | cmd:c 
+             {: Bloco b = new Bloco(); b.adicionar(c); RESULT = b; :};            
 
-atribuicao ::= ID:id IGUAL expr:e 
-             {: RESULT = new Atribuicao(id, e); :}
-             | ID:id IGUAL condicao:c 
-             {: RESULT = new Atribuicao(id, c); :};
+    
+
+declaracao ::= tipo:t ID:id IGUAL expr:e 
+             {: 
+                RESULT = new DeclaracaoVariavel(t, id, e); 
+             :};
+
+atribuicao ::= ID:id IGUAL expr:e {: RESULT = new Atribuicao(id, e); :}
+             | ID:id IGUAL condicao:c {: RESULT = new Atribuicao(id, c); :};
+
+args ::= expr:e VIRGULA args:a {: a.add(0, e); RESULT = a; :}
+       | expr:e {: List<Expressao> l = new ArrayList<>(); l.add(e); RESULT = l; :}
+       | /* Vazio */ {: RESULT = new ArrayList<Expressao>(); :};             
 
 cmd ::= 
-   RETORNE expr:e PV 
-      {: RESULT = new Retorno(e); :}
-    |   
-    // Atribuição simples
-    atribuicao:a PV 
-    {: 
-        RESULT = a; 
-    :}    
-    // Comando SE COM SENAO (Completo)
-    |
-    SE AP condicao:c FP ENTAO cmd:t SENAO cmd:e 
-    {: 
-        RESULT = new CondicaoSe(c, t, e); 
-    :}
-
-    // Comando SE SIMPLES (Novo!)
-    |
-    SE AP condicao:c FP ENTAO cmd:t 
-    {: 
-        // Passamos 'null' porque não existe bloco else
-        RESULT = new CondicaoSe(c, t, null); 
-    :}
+    RETORNE expr:e PV {: RESULT = new Retorno(e); :}
+    
+    | declaracao:d PV {: RESULT = d; :}
+    | atribuicao:a PV {: RESULT = a; :}
+    
+    | SE AP condicao:c FP ENTAO cmd:t SENAO cmd:e 
+      {: RESULT = new CondicaoSe(c, t, e); :}
+    | SE AP condicao:c FP ENTAO cmd:t 
+      {: RESULT = new CondicaoSe(c, t, null); :}
+    
     | ENQUANTO AP condicao:c FP FACA lista_cmds:body FIM
-      {: 
-        RESULT = new Enquanto(c, body); 
-      :}
-     | PARA AP atribuicao:init PV condicao:cond PV atribuicao:inc FP FACA lista_cmds:body FIM
-    {: 
-       RESULT = new Para(init, cond, inc, body); 
-    :}; 
+      {: RESULT = new Enquanto(c, body); :}
+   
+    | PARA AP atribuicao:init PV condicao:cond PV atribuicao:inc FP FACA lista_cmds:body FIM
+      {: RESULT = new Para(init, cond, inc, body); :};
 
 // Expressões
 expr ::= expr:e1 MAIS expr:e2 

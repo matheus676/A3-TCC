@@ -1,5 +1,6 @@
 package com.portugol.visitor;
 
+
 import com.portugol.ast.*;
 import com.portugol.gerador.Gerador;
 import com.portugol.visitor.Visitor;
@@ -128,8 +129,8 @@ public class TacGerador implements Visitor {
         // Gera o Label da função
         Gerador.add("LABEL", n.nome);
         
-        for (String param : n.parametros) {
-            Gerador.add("POP", param, null, null);
+        for (Parametro param : n.parametros) {
+            Gerador.add("POP", param.nome, null, null);
         }
         
         n.corpo.accept(this);
@@ -161,5 +162,21 @@ public class TacGerador implements Visitor {
         Gerador.add("CALL", n.nome, qtdArgs, temp);
         
         n.tempResult = temp;
+    }
+
+    @Override
+    public void visit(DeclaracaoVariavel n){
+    }
+
+    @Override
+    public void visit(Tipo n) {
+    }
+
+    @Override
+    public void visit(Expressao n) {
+    }
+
+    @Override
+    public void visit(Parametro n) {
     }
 }

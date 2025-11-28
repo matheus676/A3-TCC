@@ -2,6 +2,8 @@ package com.portugol.visitor;
 import com.portugol.ast.*;
 
 public interface Visitor {
+    void visit(Expressao n);
+    void visit(Parametro n); 
     void visit(ExpressaoBinaria n);
     void visit(CondicaoSe n);
     void visit(Atribuicao n);
@@ -14,4 +16,6 @@ public interface Visitor {
     void visit(Retorno n);
     void visit(FuncaoChamada n);
     void visit(Programa n);
+    void visit(DeclaracaoVariavel n);
+    void visit(Tipo n);
 }

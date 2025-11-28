@@ -1,13 +1,19 @@
 package com.portugol.visitor;
 
 import com.portugol.ast.*;
+
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
 import com.portugol.visitor.Visitor;
 
 public class SemanticVisitor implements Visitor {
-    private Set<String> tabelaSimbolos = new HashSet<>();
+    private Map<String, Tipo> tabelaSimbolos = new HashMap<>();
     private boolean encontrouInicio;
+    private Map<String, Tipo> tabelaVariaveis = new HashMap<>();
+    private Map<String, Tipo> tabelaFuncoes = new HashMap<>();
 
     @Override
     public void visit(Bloco n) {
@@ -18,15 +24,26 @@ public class SemanticVisitor implements Visitor {
 
     @Override
     public void visit(Atribuicao n) {
+        if (!tabelaSimbolos.containsKey(n.id)) {
+            throw new RuntimeException("Erro Semântico: Variável '" + n.id + "' não foi declarada!");
+        }
         n.valor.accept(this);
-        tabelaSimbolos.add(n.id);
+
+        Tipo tipoVariavel = tabelaSimbolos.get(n.id);
+
+        if (tipoVariavel != n.valor.tipo) {
+            throw new RuntimeException("Erro de Tipagem: Variável '" + n.id + "' é " + tipoVariavel + 
+                                     " mas recebeu " + n.valor.tipo);
+        }
     }
 
     @Override
     public void visit(Variavel n) {
-        if (!tabelaSimbolos.contains(n.id)) {
+        if (!tabelaSimbolos.containsKey(n.id)) {
             throw new RuntimeException("Erro Semântico: Variável '" + n.id + "' não foi declarada!");
         }
+        n.tipo = tabelaSimbolos.get(n.id);
+        n.tempResult = n.id;
     }
 
     @Override
@@ -89,8 +106,8 @@ public class SemanticVisitor implements Visitor {
 
         // 2. Lógica de Escopo (que você já fez)
         tabelaSimbolos.clear(); 
-        for (String param : n.parametros) {
-            tabelaSimbolos.add(param);
+        for (Parametro param : n.parametros) {
+            tabelaSimbolos.put(param.nome, param.tipo);
         }
         n.corpo.accept(this);
     }
@@ -106,4 +123,34 @@ public class SemanticVisitor implements Visitor {
         }
     }
 
+    @Override
+    public void visit(DeclaracaoVariavel n) {
+        // 1. Verifica se já existe
+        if (tabelaSimbolos.containsKey(n.id)) {
+            throw new RuntimeException("Erro Semântico: Variável '" + n.id + "' já foi declarada!");
+        }
+
+        // 2. Calcula o tipo da expressão inicial (ex: 10)
+        n.expressao.accept(this);
+
+        // 3. Verifica se os tipos batem
+        if (n.tipoDeclarado != n.expressao.tipo) {
+             throw new RuntimeException("Erro de Tipagem: Tentando atribuir " + n.expressao.tipo + 
+                                      " na variável '" + n.id + "' que é " + n.tipoDeclarado);
+        }
+
+        // 4. Registra na tabela
+        tabelaSimbolos.put(n.id, n.tipoDeclarado);
+    }
+    @Override
+    public void visit(Tipo n) {
+    }
+
+    @Override
+    public void visit(Expressao n) {
+    }
+
+    @Override
+    public void visit(Parametro n) {
+    }
 }
