@@ -179,8 +179,8 @@ public class SemanticVisitor implements Visitor {
 
         // 3. Verifica se os tipos batem
         if (n.tipoDeclarado != n.expressao.tipo) {
-             throw new RuntimeException("Erro de Tipagem: Tentando atribuir " + n.expressao.tipo + 
-                                      " na variável '" + n.id + "' que é " + n.tipoDeclarado);
+             throw new RuntimeException("Erro de Tipagem: Tentando atribuir " + n.tipoDeclarado + 
+                                      " na variável '" + n.id + "' que é " +  n.expressao.tipo);
         }
 
         // 4. Registra na tabela

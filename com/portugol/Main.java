@@ -48,6 +48,8 @@ public class Main {
                 System.out.println("Codigo gerado em: " + arquivoSaida);
             }
 
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
         } catch (Exception e) {
             System.err.println("Erro na compilacao:");
             e.printStackTrace();
