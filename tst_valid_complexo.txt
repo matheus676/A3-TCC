@@ -1,0 +1,17 @@
+funcao fatorial(n) faca
+    se (n < 2) entao
+        retorne 1;
+    senao
+        retorne n * fatorial(n - 1);
+
+
+funcao inicio() faca
+    i = 0;
+    para(i = 0; i < 5; i = i + 1) faca
+        f = fatorial(i);
+    
+    
+    cont = 10;
+    enquanto (cont > 0) faca
+        cont = cont - 1;
+    

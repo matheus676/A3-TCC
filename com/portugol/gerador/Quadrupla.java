@@ -23,6 +23,10 @@ public class Quadrupla {
                 return "GOTO " + res;
             case "LABEL":
                 return res + ":";
+            case "POP": case "PARAM": case "RETURN":
+                return op + " " +arg1;
+            case "CALL":
+                return res + " = CALL " + arg1 + ", " + arg2;                
             default:
                 return op + " " + arg1 + " " + arg2 + " " + res;
         }

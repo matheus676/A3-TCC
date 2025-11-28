@@ -1,0 +1,5 @@
+funcao teste() faca
+    a = 50;
+
+funcao inicio() faca
+    b = a;

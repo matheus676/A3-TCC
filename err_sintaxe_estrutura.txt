@@ -1,0 +1,4 @@
+funcao inicio() faca
+    x = 10;
+    se x > 0 entao
+        x = 0;

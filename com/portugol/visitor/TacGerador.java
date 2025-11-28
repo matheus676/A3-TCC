@@ -116,12 +116,21 @@ public class TacGerador implements Visitor {
     }
 
     @Override
+    public void visit(Programa n) {
+        // Itera sobre todas as funções gerando código
+        for (FuncaoDeclaracao f : n.funcoes) {
+            f.accept(this);
+        }
+    }
+
+    @Override
     public void visit(FuncaoDeclaracao n) {
         // Gera o Label da função
         Gerador.add("LABEL", n.nome);
         
-        // (Opcional) Em TAC puro, costuma-se fazer "POP" dos parametros
-        // Mas para simplificar, apenas assumimos que as variaveis n.parametros existem
+        for (String param : n.parametros) {
+            Gerador.add("POP", param, null, null);
+        }
         
         n.corpo.accept(this);
         

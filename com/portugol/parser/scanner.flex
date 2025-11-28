@@ -23,6 +23,7 @@ Espaco = [ \t\r\n]+
 "faca"      { return new Symbol(sym.FACA); }
 "funcao"    { return new Symbol(sym.FUNCAO); }
 "retorne"   { return new Symbol(sym.RETORNE); }
+"fim"       { return new Symbol(sym.FIM); }
 
 "+"         { return new Symbol(sym.MAIS); }
 "-"       { return new Symbol(sym.MENOS); }

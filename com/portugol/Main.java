@@ -18,25 +18,23 @@ public class Main {
         Scanner lexer = new Scanner(new FileReader(args[0]));
         parser p = new parser(lexer);
 
-        // 1. O Parser retorna a Árvore (AST)
-        List<FuncaoDeclaracao> funcoes = (List<FuncaoDeclaracao>) p.parse().value;
+        // 1. O Parser retorna o nó Raiz (Programa)
+        // Note o cast para Node ou Programa
+        Node raiz = (Node) p.parse().value;
 
+        // 2. Semântica
         SemanticVisitor semantico = new SemanticVisitor();
-        for (FuncaoDeclaracao f : funcoes) {
-            f.accept(semantico);
-        }
-        semantico.concluir();
+        raiz.accept(semantico);
+        semantico.concluir(); // Verifica se tem 'inicio'
 
+        // 3. Geração
         TacGerador gerador = new TacGerador();
+        raiz.accept(gerador);
 
-        // Gera código para todas as funções
-        for (FuncaoDeclaracao f : funcoes) {
-            f.accept(gerador);
-        }
-
+        // 4. Impressão (Bootstrap)
         System.out.println("CALL inicio, 0, t_main");
         System.out.println("EXIT");
-
+        
         for (Quadrupla q : Gerador.codigo) {
             System.out.println(q);
         }

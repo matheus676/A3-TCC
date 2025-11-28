@@ -5,20 +5,38 @@ import java_cup.runtime.*;
 import java.util.List;
 import java.util.ArrayList;
 
+parser code {:
+   @Override
+    public void syntax_error(Symbol s) {
+        String lexema = (s.value != null) ? s.value.toString() : sym.terminalNames[s.sym];
+        System.err.println("Erro de Sintaxe na linha " + (s.left + 1) + 
+                           ", coluna " + (s.right + 1) + 
+                           ". Encontrado: " + lexema);
+    }
+
+    @Override
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {
+        System.err.println("Erro Fatal: Não foi possível recuperar a análise após o erro na linha " + 
+                           (s.left + 1) + ".");
+        throw new Exception("Erro Fatal de Sintaxe"); 
+    }
+:}
+
 // 1. Definição dos Terminais
 terminal SE, ENTAO, SENAO;
-terminal FUNCAO, RETORNE, VIRGULA, FACA, ENQUANTO, PARA, MAIS, MENOS, MENOR, MULT, DIV, MAIOR, IGUAL, AP, FP, PV;
+terminal FUNCAO, RETORNE, VIRGULA, FACA, ENQUANTO, PARA, MAIS, MENOS, MENOR, MULT, DIV, MAIOR, IGUAL, AP, FP, PV, FIM;
 terminal String ID, NUM;
 
 // 2. Definição dos Não-Terminais
 // Todos retornam objetos da árvore (Node, Expressao, Bloco)
-non terminal Bloco programa, lista_cmds;
+non terminal Bloco lista_cmds;
 non terminal Atribuicao atribuicao;
 non terminal Node cmd;
 non terminal Expressao expr, condicao;
 
-non terminal FuncaoDeclaracao funcao;
+non terminal Programa programa;
 non terminal List<FuncaoDeclaracao> lista_funcoes;
+non terminal FuncaoDeclaracao funcao;
 non terminal List<String> params;
 non terminal List<Expressao> args;
 
@@ -30,9 +48,12 @@ precedence left MAIOR;
 precedence left MAIS, MENOS;
 precedence left MULT, DIV;
 
-start with lista_funcoes;
+start with programa;
 
 // 4. Gramática
+
+programa ::= lista_funcoes:l 
+           {: RESULT = new Programa(l); :};
 
 lista_funcoes ::= lista_funcoes:l funcao:f 
                 {: l.add(f); RESULT = l; :}
@@ -43,7 +64,7 @@ lista_funcoes ::= lista_funcoes:l funcao:f
                    RESULT = l; 
                 :};
 
-funcao ::= FUNCAO ID:nome AP params:p FP FACA lista_cmds:corpo 
+funcao ::= FUNCAO ID:nome AP params:p FP FACA lista_cmds:corpo FIM
          {: 
             RESULT = new FuncaoDeclaracao(nome, p, corpo); 
          :};
@@ -112,11 +133,11 @@ cmd ::=
         // Passamos 'null' porque não existe bloco else
         RESULT = new CondicaoSe(c, t, null); 
     :}
-    | ENQUANTO AP condicao:c FP FACA cmd:body 
+    | ENQUANTO AP condicao:c FP FACA lista_cmds:body FIM
       {: 
         RESULT = new Enquanto(c, body); 
       :}
-     | PARA AP atribuicao:init PV condicao:cond PV atribuicao:inc FP FACA cmd:body
+     | PARA AP atribuicao:init PV condicao:cond PV atribuicao:inc FP FACA lista_cmds:body FIM
     {: 
        RESULT = new Para(init, cond, inc, body); 
     :}; 

@@ -13,4 +13,5 @@ public interface Visitor {
     void visit(FuncaoDeclaracao n);
     void visit(Retorno n);
     void visit(FuncaoChamada n);
+    void visit(Programa n);
 }

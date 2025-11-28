@@ -14,12 +14,12 @@ public class sym {
   public static final int ENTAO = 3;
   public static final int FP = 19;
   public static final int IGUAL = 17;
-  public static final int ID = 21;
+  public static final int ID = 22;
   public static final int PV = 20;
   public static final int PARA = 10;
   public static final int AP = 18;
   public static final int VIRGULA = 7;
-  public static final int NUM = 22;
+  public static final int NUM = 23;
   public static final int FUNCAO = 5;
   public static final int MAIS = 11;
   public static final int RETORNE = 6;
@@ -31,6 +31,7 @@ public class sym {
   public static final int SE = 2;
   public static final int FACA = 8;
   public static final int ENQUANTO = 9;
+  public static final int FIM = 21;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -53,6 +54,7 @@ public class sym {
   "AP",
   "FP",
   "PV",
+  "FIM",
   "ID",
   "NUM"
   };

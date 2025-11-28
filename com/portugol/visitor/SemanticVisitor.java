@@ -62,7 +62,17 @@ public class SemanticVisitor implements Visitor {
     }
 
     @Override
+    public void visit(Programa n) {
+        for (FuncaoDeclaracao f : n.funcoes) {
+            f.accept(this);
+        }
+    }
+
+    @Override
     public void visit(FuncaoChamada n) {
+        for(Expressao arg : n.argumentos){
+            arg.accept(this);
+        }
     }
 
     @Override
@@ -87,6 +97,7 @@ public class SemanticVisitor implements Visitor {
 
     @Override
     public void visit(Retorno n) {
+        n.expr.accept(this);
     }
 
     public void concluir() {

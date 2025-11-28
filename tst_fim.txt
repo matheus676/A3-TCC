@@ -1,0 +1,12 @@
+funcao inicio() faca
+    x = 0;
+    
+    enquanto (x < 5) faca 
+        x = x + 1;
+        y = x * 2;
+    fim
+
+    para (i = 0; i < 3; i = i + 1) faca
+        x = x + i;
+    fim
+fim 

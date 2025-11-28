@@ -1,0 +1,7 @@
+funcao soma(a, b) faca
+    retorne a + b;
+
+funcao inicio() faca
+    x = 10;
+    y = 20;
+    res = soma(x, y);
