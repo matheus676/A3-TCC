@@ -1,5 +1,7 @@
-funcao inicio() faca
-    x = 0;
+funcao vazio inicio() faca
+    inteiro x = 0;
+    inteiro y = 0;
+    inteiro i = 0;
     
     enquanto (x < 5) faca 
         x = x + 1;
@@ -9,4 +11,4 @@ funcao inicio() faca
     para (i = 0; i < 3; i = i + 1) faca
         x = x + i;
     fim
-fim 
+fim

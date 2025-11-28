@@ -1,2 +1,0 @@
-para (i = 0; i < 5; i = i + 1) faca
-    x = x + 2;

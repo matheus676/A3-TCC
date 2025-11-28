@@ -1,17 +1,19 @@
-funcao fatorial(n) faca
+funcao inteiro fatorial(inteiro n) faca
     se (n < 2) entao
         retorne 1;
     senao
         retorne n * fatorial(n - 1);
+fim
 
-
-funcao inicio() faca
-    i = 0;
+funcao vazio inicio() faca
+    inteiro i = 0;
+    inteiro f = 0;
     para(i = 0; i < 5; i = i + 1) faca
         f = fatorial(i);
+    fim
     
-    
-    cont = 10;
+    inteiro cont = 10;
     enquanto (cont > 0) faca
         cont = cont - 1;
-    
+    fim
+fim

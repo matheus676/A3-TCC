@@ -165,7 +165,10 @@ public class TacGerador implements Visitor {
     }
 
     @Override
-    public void visit(DeclaracaoVariavel n){
+    public void visit(DeclaracaoVariavel n) {
+        n.expressao.accept(this);
+        
+        Gerador.add("=", n.expressao.tempResult, n.id);
     }
 
     @Override

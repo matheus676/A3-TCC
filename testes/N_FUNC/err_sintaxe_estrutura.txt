@@ -1,0 +1,6 @@
+funcao vazio inicio() faca
+    inteiro x = 10;
+    se x > 0 entao
+        x = 0;
+    fim
+fim

@@ -1,0 +1,7 @@
+funcao inteiro soma(inteiro a, inteiro b) faca 
+    retorne a + b;
+fim
+
+funcao vazio inicio() faca
+    inteiro res = soma(10, 20);
+fim

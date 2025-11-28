@@ -1,0 +1,7 @@
+funcao vazio inicio() faca
+    inteiro x = 0;
+    inteiro i = 0;
+    para (i = 0; i < 5; i = i + 1) faca
+        x = x + 2;
+    fim
+fim

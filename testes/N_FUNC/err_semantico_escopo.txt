@@ -1,0 +1,7 @@
+funcao vazio teste() faca
+    inteiro a = 50;
+fim
+
+funcao vazio inicio() faca
+    inteiro b = a;
+fim

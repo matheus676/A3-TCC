@@ -1,0 +1,19 @@
+funcao inteiro soma(inteiro a, inteiro b) faca
+    retorne a + b;
+fim
+
+funcao vazio inicio() faca
+    inteiro x = 10;
+    inteiro y = 20;
+    
+    inteiro resultado = soma(x, y);
+    
+    booleano condicao = resultado > 15;
+    
+    se (condicao) entao
+        x = x + 1;
+    senao
+        x = x - 1;
+    
+    y = x * 2;
+fim

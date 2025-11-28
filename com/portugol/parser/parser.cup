@@ -33,7 +33,7 @@ terminal String ID, NUM;
 non terminal Bloco lista_cmds;
 non terminal Atribuicao atribuicao;
 non terminal Node cmd;
-non terminal Expressao expr, condicao;
+non terminal Expressao expr;
 
 non terminal Programa programa;
 non terminal List<FuncaoDeclaracao> lista_funcoes;
@@ -48,7 +48,7 @@ non terminal List<Expressao> args;
 // 3. Precedência
 precedence left ENTAO;
 precedence left SENAO;
-precedence left MAIOR;
+precedence left MAIOR, MENOR;
 precedence left MAIS, MENOS;
 precedence left MULT, DIV;
 
@@ -103,8 +103,7 @@ declaracao ::= tipo:t ID:id IGUAL expr:e
                 RESULT = new DeclaracaoVariavel(t, id, e); 
              :};
 
-atribuicao ::= ID:id IGUAL expr:e {: RESULT = new Atribuicao(id, e); :}
-             | ID:id IGUAL condicao:c {: RESULT = new Atribuicao(id, c); :};
+atribuicao ::= ID:id IGUAL expr:e {: RESULT = new Atribuicao(id, e); :};
 
 args ::= expr:e VIRGULA args:a {: a.add(0, e); RESULT = a; :}
        | expr:e {: List<Expressao> l = new ArrayList<>(); l.add(e); RESULT = l; :}
@@ -116,15 +115,15 @@ cmd ::=
     | declaracao:d PV {: RESULT = d; :}
     | atribuicao:a PV {: RESULT = a; :}
     
-    | SE AP condicao:c FP ENTAO cmd:t SENAO cmd:e 
+    | SE AP expr:c FP ENTAO cmd:t SENAO cmd:e 
       {: RESULT = new CondicaoSe(c, t, e); :}
-    | SE AP condicao:c FP ENTAO cmd:t 
+    | SE AP expr:c FP ENTAO cmd:t 
       {: RESULT = new CondicaoSe(c, t, null); :}
     
-    | ENQUANTO AP condicao:c FP FACA lista_cmds:body FIM
+    | ENQUANTO AP expr:c FP FACA lista_cmds:body FIM
       {: RESULT = new Enquanto(c, body); :}
    
-    | PARA AP atribuicao:init PV condicao:cond PV atribuicao:inc FP FACA lista_cmds:body FIM
+    | PARA AP atribuicao:init PV expr:cond PV atribuicao:inc FP FACA lista_cmds:body FIM
       {: RESULT = new Para(init, cond, inc, body); :};
 
 // Expressões
@@ -139,6 +138,13 @@ expr ::= expr:e1 MAIS expr:e2
        
        | expr:e1 DIV expr:e2 
        {: RESULT = new ExpressaoBinaria(e1, e2, Operador.DIV); :}
+
+       | expr:e1 MAIOR expr:e2 
+       {: RESULT = new ExpressaoBinaria(e1, e2, Operador.MAIOR); :}
+       
+       | expr:e1 MENOR expr:e2 
+       {: RESULT = new ExpressaoBinaria(e1, e2, Operador.MENOR); :}
+
        | NUM:n 
        {: 
           RESULT = new Numero(n); 
@@ -150,11 +156,3 @@ expr ::= expr:e1 MAIS expr:e2
        {: 
           RESULT = new Variavel(id); 
        :};
-
-condicao ::= expr:e1 MAIOR expr:e2 
-           {: RESULT = new ExpressaoBinaria(e1, e2, Operador.MAIOR); 
-           :}
-           | expr:e1 MENOR expr:e2 
-           {: RESULT = new ExpressaoBinaria(e1, e2, Operador.MENOR); 
-           :}
-           ;

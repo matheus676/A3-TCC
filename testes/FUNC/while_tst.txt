@@ -1,0 +1,6 @@
+funcao vazio inicio() faca
+    inteiro x = 0;
+    enquanto (x < 5) faca 
+        x = x + 1;
+    fim
+fim

@@ -1,0 +1,4 @@
+funcao vazio inicio() faca
+    inteiro x = 10;
+    inteiro z = x + y;
+fim
