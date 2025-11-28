@@ -1,6 +1,7 @@
 package com.portugol;
 
 import java.io.FileReader;
+import java.io.PrintWriter; // Para escrever em arquivo
 import java.util.List;
 
 import com.portugol.parser.Scanner;
@@ -11,32 +12,45 @@ import com.portugol.visitor.SemanticVisitor;
 import com.portugol.gerador.Gerador;
 import com.portugol.gerador.Quadrupla;
 import com.portugol.ast.FuncaoDeclaracao;
-
+import com.portugol.ast.Programa;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
-        Scanner lexer = new Scanner(new FileReader(args[0]));
-        parser p = new parser(lexer);
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            System.err.println("Uso: java -jar portugol.jar <arquivo.txt>");
+            return;
+        }
 
-        // 1. O Parser retorna o nó Raiz (Programa)
-        // Note o cast para Node ou Programa
-        Node raiz = (Node) p.parse().value;
+        String arquivoEntrada = args[0];
+        String arquivoSaida = arquivoEntrada.substring(0, arquivoEntrada.lastIndexOf('.')) + ".tac";
 
-        // 2. Semântica
-        SemanticVisitor semantico = new SemanticVisitor();
-        raiz.accept(semantico);
-        semantico.concluir(); // Verifica se tem 'inicio'
+        try {
+            Scanner lexer = new Scanner(new FileReader(arquivoEntrada));
+            parser p = new parser(lexer);
+            Programa raiz = (Programa) p.parse().value;
 
-        // 3. Geração
-        TacGerador gerador = new TacGerador();
-        raiz.accept(gerador);
+            SemanticVisitor semantico = new SemanticVisitor();
+            raiz.accept(semantico);
+            semantico.concluir(); 
 
-        // 4. Impressão (Bootstrap)
-        System.out.println("CALL inicio, 0, t_main");
-        System.out.println("EXIT");
-        
-        for (Quadrupla q : Gerador.codigo) {
-            System.out.println(q);
+            TacGerador gerador = new TacGerador();
+            raiz.accept(gerador);
+
+            try (PrintWriter writer = new PrintWriter(arquivoSaida)) {
+                writer.println("CALL inicio, 0, t_main");
+                writer.println("EXIT");
+                
+                for (Quadrupla q : Gerador.codigo) {
+                    writer.println(q);
+                }
+                
+                System.out.println("Compilacao com sucesso!");
+                System.out.println("Codigo gerado em: " + arquivoSaida);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro na compilacao:");
+            e.printStackTrace();
         }
     }
 }
